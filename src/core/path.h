@@ -1,25 +1,36 @@
 #pragma once
-#include <string_view>
+#include <string>
 
-class IPath
+using namespace std;
+
+namespace Paths
 {
-private:
-    enum
+    class IPath
     {
-        file = 'f', // 0
-        directory = 'd', // 1
+    public:
+        explicit IPath(const string& data ) : data(data){}
+        string getData() const;
+    private:
+        string data;
     };
-public:
-};
 
 
-class Path : public IPath
-{
-private:
+    class File : public IPath
+    {
+    public:
+        explicit File(const string& data): IPath(data){}
+        friend std::ostream& operator<<(std::ostream& os, const IPath& path) ;
+    private:
+        string data;
+    };
 
-};
+    class Directory : public IPath
+    {
+    public:
+        explicit Directory(const string& data): IPath(data){}
+        friend std::ostream& operator<<(std::ostream& os, const IPath& obj);
+    private:
+        string data;
+    };
+}
 
-class Directory : public IPath
-{
-
-};

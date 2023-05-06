@@ -3,8 +3,9 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
+#include <pwd.h>
 #include <filesystem>
-#include <forward_list>
+#include <vector>
 #include <string>
 #include <string_view>
 
@@ -13,39 +14,51 @@ using namespace std;
 
 namespace Core
 {
-    typedef string_view str;
-
     class Core
     {
     private:
-        str current_dir;
-        str dir_to_search;
-        str user_name;
-        str group_name;
+        string current_dir;
+        string dir_to_search;
+        string user_name;
+        string group_name;
+        uid_t user_id;
+        gid_t group_id;
 
     public:
-        explicit Core(str dir_to_search,
-             str user, str group);// Search all matches of user and group coincidences
-        explicit Core(str dir_to_search); // Search all open for reading file
-        void changeCurrentDir();
-        void showSutableDirsAndFiles();
-
+        Core(const string& user,
+             const string& group, const string& dir_to_search);// Search all matches of user and group coincidences
+        Core(const string& dir_to_search); // Search all open for reading file
+        [[nodiscard]] SearchEngine::Engine* createEngine();
+        void setUsername (const string& name) noexcept;
+        void setGroup (const string& group) noexcept;
+        void setDirToSearch (const string& dir) noexcept;
+        string& getUsername () noexcept;
+        string& getGroup() noexcept;
+        string& getDirToSearch() noexcept;
+        string& getCurrentDir() noexcept;
+        uid_t& getUserId() noexcept;
+        gid_t& getGroupId() noexcept;
+        void findUserId() noexcept;
+        void findGroupId() noexcept;
+        [[nodiscard]] bool validateStartAndFinishDir(); // check is the finish dir contain part of the baseDir
+        friend class SearchEngine::Engine;
     };
 
 }
 
 namespace SearchEngine
 {
-    typedef forward_list<Ipath*> pathList;
+    typedef vector<Paths::IPath*> pathVec;
     class Engine
     {
     private:
-        pathList result;
-        struct Buf;
-
+        pathVec result;
+        struct Info{};
     public:
-        pathList search();
-
+        void showResults() const noexcept;
+        [[nodiscard]] pathVec search(Core::Core *core);
+        friend class Core::Core;
+        friend class Paths::IPath;
     };
 }
 
