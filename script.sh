@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
-sh /home/cpr4z/CLionProjects/Aurora_test/build/Aurora_test
+/usr/local/bin/Aurora_test
 

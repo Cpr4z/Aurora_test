@@ -107,7 +107,7 @@ namespace SearchEngine
 {
     pathVec Engine::search(Core::Core *core)
     {
-        for (const auto& file: filesystem::recursive_directory_iterator(core->getDirToSearch()))
+        for (const auto& file: filesystem::directory_iterator(core->getDirToSearch()))
         {
             if (file.path().string().find("/sys/") || file.path().string().find("/proc/")) // if path contains /sys/ /proc/ we will skip it
             {
@@ -124,16 +124,14 @@ namespace SearchEngine
                 {
                     if (filesystem::is_directory(file)) // if object is directory
                     {
-                        result.push_back(new Paths::Directory(file.path().string())); // create new object directory
                         core->setDirToSearch(file.path().string());
                         delete st;
                         search(core);
+                        result.push_back(new Paths::Directory(file.path().string())); // create new object directory
                     } else // if object is file
                     {
                         result.push_back(new Paths::File(file.path().string()));
-                        core->setDirToSearch(file.path().string());
                         delete st;
-                        search(core);
                     }
                 }
                 else

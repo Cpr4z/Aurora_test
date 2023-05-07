@@ -1,6 +1,5 @@
 #include "src/core/myExceptions.h"
 #include "src/core/core.h"
-#include <memory>
 
 int main(int argc, char* argv[])
 {
