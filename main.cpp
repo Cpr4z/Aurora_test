@@ -1,5 +1,5 @@
-#include "core/myExceptions.h"
-#include "core/core.h"
+#include "src/core/myExceptions.h"
+#include "src/core/core.h"
 #include <memory>
 
 int main(int argc, char* argv[])
@@ -13,14 +13,14 @@ int main(int argc, char* argv[])
         }
         else
         {
-//            Core::Core *core = new Core(argv[2], argv[4], argv[6]);
-            auto ptr = make_unique<Core::Core>
-                    (argv[2], argv[4], argv[6]);
+            auto ptr = new Core::Core (argv[2], argv[4], argv[6]);
             try
             {
                 if (ptr->validateStartAndFinishDir())
                 {
-                    ptr->createEngine();
+                    auto engine = ptr->createEngine();
+                    engine->search(ptr);
+                    engine->showResults();
                 }
                 else
                 {

@@ -12,15 +12,20 @@
 
 using namespace std;
 
+namespace SearchEngine
+{
+    class Engine;
+}
+
 namespace Core
 {
     class Core
     {
     private:
-        string current_dir;
-        string dir_to_search;
         string user_name;
         string group_name;
+        string dir_to_search;
+        string current_dir;
         uid_t user_id;
         gid_t group_id;
 
@@ -41,7 +46,6 @@ namespace Core
         void findUserId() noexcept;
         void findGroupId() noexcept;
         [[nodiscard]] bool validateStartAndFinishDir(); // check is the finish dir contain part of the baseDir
-        friend class SearchEngine::Engine;
     };
 
 }
@@ -53,10 +57,9 @@ namespace SearchEngine
     {
     private:
         pathVec result;
-        struct Info{};
     public:
         void showResults() const noexcept;
-        [[nodiscard]] pathVec search(Core::Core *core);
+        pathVec search(Core::Core *core);
         friend class Core::Core;
         friend class Paths::IPath;
     };

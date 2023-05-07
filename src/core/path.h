@@ -9,7 +9,7 @@ namespace Paths
     {
     public:
         explicit IPath(const string& data ) : data(data){}
-        string getData() const;
+        [[nodiscard]]string getData() const;
     private:
         string data;
     };

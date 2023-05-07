@@ -116,30 +116,30 @@ namespace SearchEngine
             }
             else {
                 struct stat *st= new struct stat();
-                lstat(file.path().string(), st); // get information about file
+                lstat(file.path().string().c_str(), st); // get information about file
                 // required conditions
-                if ((st->st_uid == core->getUserId() && st->st_mod == S_IWUSR ) ||
-                    (st->st_gid == core->getGroupId() && st->st_mod == S_IWGRP) ||
-                    (st->st_mod == S_IWOTH ))
+                if ((st->st_uid == core->getUserId() && st->st_mode == S_IWUSR ) ||
+                    (st->st_gid == core->getGroupId() && st->st_mode == S_IWGRP) ||
+                    (st->st_mode == S_IWOTH ))
                 {
                     if (filesystem::is_directory(file)) // if object is directory
                     {
                         result.push_back(new Paths::Directory(file.path().string())); // create new object directory
                         core->setDirToSearch(file.path().string());
-                        delete stat;
+                        delete st;
                         search(core);
                     } else // if object is file
                     {
                         result.push_back(new Paths::File(file.path().string()));
                         core->setDirToSearch(file.path().string());
-                        delete stat;
+                        delete st;
                         search(core);
                     }
                 }
                 else
                 {
                     core->setDirToSearch(file.path().string());
-                    delete stat;
+                    delete st;
                     search(core);
                 }
             }
