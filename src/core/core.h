@@ -28,7 +28,8 @@ namespace Core
         string current_dir;
         uid_t user_id;
         gid_t group_id;
-
+        void findUserId() noexcept;
+        void findGroupId() noexcept;
     public:
         Core(const string& user,
              const string& group, const string& dir_to_search);// Search all matches of user and group coincidences
@@ -43,8 +44,6 @@ namespace Core
         string& getCurrentDir() noexcept;
         uid_t& getUserId() noexcept;
         gid_t& getGroupId() noexcept;
-        void findUserId() noexcept;
-        void findGroupId() noexcept;
         [[nodiscard]] bool validateStartAndFinishDir(); // check is the finish dir contain part of the baseDir
     };
 
@@ -59,7 +58,7 @@ namespace SearchEngine
         pathVec result;
     public:
         void showResults() const noexcept;
-        pathVec search(Core::Core *core);
+        pathVec search(Core::Core *core, const string& str);
         friend class Core::Core;
         friend class Paths::IPath;
     };

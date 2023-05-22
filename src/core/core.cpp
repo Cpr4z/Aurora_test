@@ -8,6 +8,8 @@ cr::Core (const string& username, const string& group, const string& dir_to_sear
             : user_name(username), group_name(group), dir_to_search(dir_to_search)
 {
     current_dir = filesystem::current_path().string();
+    findUserId();
+    findGroupId();
 }
 
 cr::Core (const string& dir_to_search) : dir_to_search(dir_to_search)
@@ -74,7 +76,7 @@ void cr::findUserId() noexcept
 void cr::findGroupId() noexcept
 {
     auto groupInfo = getpwnam(group_name.c_str());
-    user_id = groupInfo->pw_uid;
+    group_id = groupInfo->pw_gid;
 }
 
 bool cr::validateStartAndFinishDir() //     /home/myname   home/myname/testdir/
@@ -105,14 +107,19 @@ bool cr::validateStartAndFinishDir() //     /home/myname   home/myname/testdir/
 
 namespace SearchEngine
 {
-    pathVec Engine::search(Core::Core *core)
+    pathVec Engine::search(Core::Core *core, const string& current_path)
     {
-        for (const auto& file: filesystem::directory_iterator(core->getDirToSearch()))
+        for (const auto& file: filesystem::directory_iterator(current_path))
         {
             if (file.path().string().find("/sys/") || file.path().string().find("/proc/")) // if path contains /sys/ /proc/ we will skip it
             {
-                core->setDirToSearch(file.path().string()); //
-                search(core);
+                if (filesystem::is_directory(file))
+                {
+                    search(core, file.path().string());
+                }
+                else
+                {
+                }
             }
             else {
                 struct stat *st= new struct stat();
@@ -124,21 +131,24 @@ namespace SearchEngine
                 {
                     if (filesystem::is_directory(file)) // if object is directory
                     {
-                        core->setDirToSearch(file.path().string());
                         delete st;
-                        search(core);
+                        search(core, file.path().string());
                         result.push_back(new Paths::Directory(file.path().string())); // create new object directory
                     } else // if object is file
                     {
-                        result.push_back(new Paths::File(file.path().string()));
                         delete st;
+                        cout << file.path().string() << endl;
+                        result.push_back(new Paths::File(file.path().string()));
                     }
+                }
+                else if (filesystem::is_directory(file))// directory
+                {
+                    delete st;
+                    search(core, file.path().string());
                 }
                 else
                 {
-                    core->setDirToSearch(file.path().string());
                     delete st;
-                    search(core);
                 }
             }
         }
@@ -151,7 +161,8 @@ namespace SearchEngine
         if (result.empty())
         {
             cout << "No files and dirs were found" << endl;
-        }else
+        }
+        else
         {
             for(const auto& file : result)
             {

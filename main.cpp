@@ -18,7 +18,7 @@ int main(int argc, char* argv[])
                 if (ptr->validateStartAndFinishDir())
                 {
                     auto engine = ptr->createEngine();
-                    engine->search(ptr);
+                    engine->search(ptr, ptr->getDirToSearch());
                     engine->showResults();
                 }
                 else
